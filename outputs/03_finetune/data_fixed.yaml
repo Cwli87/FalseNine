@@ -1,0 +1,9 @@
+names:
+- Ball
+- Player
+- Ref
+nc: 3
+path: c:/Users/seree/OneDrive/Desktop/FalseNine/data/detection
+test: test/images
+train: train/images
+val: valid/images

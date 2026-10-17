@@ -1,0 +1,3 @@
+,ball_found,ball_total,ball_extra,person_found,person_total,person_extra
+baseline (pretrained),13,17,8,237,238,61
+fine-tuned,13,17,2,233,238,2

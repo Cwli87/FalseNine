@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Ball', 'Player', 'Ref']
+
+roboflow:
+  workspace: roboflow-universe-projects
+  project: soccer-players-ckbru
+  version: 16
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/roboflow-universe-projects/soccer-players-ckbru/dataset/16
