@@ -1,0 +1,14 @@
+# big or private data: not uploaded to GitHub
+data/
+*.pt
+runs/
+
+# notebook outputs: keep only the figures used in the README
+outputs/*
+!outputs/figures/
+
+# python / editor junk
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.vscode/
