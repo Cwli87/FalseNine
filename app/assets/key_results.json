@@ -1,0 +1,53 @@
+{
+ "headline": {
+  "map50": 0.926,
+  "false_boxes_before": 61,
+  "false_boxes_after": 2,
+  "calib_error_known_m": 0.31,
+  "in_play_pct": 58
+ },
+ "detection": {
+  "test_images": 19,
+  "map50": 0.926,
+  "map50_95": 0.607,
+  "ap50": {
+   "Ball": 0.81,
+   "Player": 0.972,
+   "Ref": 0.995
+  },
+  "before_after": [
+   {
+    "model": "Pretrained YOLO11m",
+    "ball found": "13 / 17",
+    "ball extra boxes": 8,
+    "people found": "237 / 238",
+    "people extra boxes": 61
+   },
+   {
+    "model": "Fine-tuned (FalseNine)",
+    "ball found": "13 / 17",
+    "ball extra boxes": 2,
+    "people found": "233 / 238",
+    "people extra boxes": 2
+   }
+  ]
+ },
+ "tracking": {
+  "frames": 150,
+  "ids_default": 43,
+  "ids_best": 33,
+  "short_default": 27,
+  "short_best": 15,
+  "ball_detected_pct": 74,
+  "ball_filled_pct": 94
+ },
+ "pitch": {
+  "homography_residual_m": 0.09,
+  "boxes_matched_pct": 89,
+  "known_median_m": 0.31,
+  "known_p90_m": 0.85,
+  "cam_under_1m_frames": 270,
+  "cam_median_m_300_449": 2.7,
+  "cam_error_m_750": 2.1
+ }
+}

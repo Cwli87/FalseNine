@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FalseNine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f0d; --panel:#121916; --panel2:#18211d; --line:#26332d; --text:#e8efe9; --muted:#8b9a92;
+  --accent:#c6f432; --accent-rgb:198,244,50;
+  --home:#ff5d73; --away:#3ec1ff;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:16px/1.55 Archivo,system-ui,Segoe UI,sans-serif;transition:background .6s}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(900px 600px at 85% -10%,rgba(var(--accent-rgb),.13),transparent 60%),
+             radial-gradient(700px 500px at -10% 110%,rgba(var(--accent-rgb),.08),transparent 60%);transition:background .6s}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* ---- side nav ---- */
+nav{position:fixed;left:0;top:0;bottom:0;width:230px;padding:28px 18px;z-index:10;display:flex;flex-direction:column;
+  border-right:1px solid var(--line);background:rgba(11,15,13,.85);backdrop-filter:blur(10px)}
+.brand{font-weight:900;font-size:22px;letter-spacing:-.5px;margin-bottom:4px}
+.brand b{color:var(--accent);transition:color .5s}
+.sub{color:var(--muted);font-size:12px;margin-bottom:30px}
+nav a{position:relative;display:flex;gap:12px;align-items:center;padding:10px 12px;margin:2px 0;border-radius:8px;
+  color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;transition:color .25s,background .25s,transform .25s}
+nav a i{font-style:normal;font-family:"JetBrains Mono",monospace;font-size:11px;opacity:.7}
+nav a:hover{color:var(--text)}
+nav a.on{color:var(--text);background:rgba(var(--accent-rgb),.12);transform:translateX(4px)}
+nav a.on::before{content:"";position:absolute;left:-18px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent)}
+nav a.on i{color:var(--accent);opacity:1}
+.progress{margin-top:auto;height:3px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress div{height:100%;width:0;background:var(--accent);transition:background .5s}
+
+main{margin-left:230px;position:relative;z-index:1}
+section{min-height:100vh;padding:90px 6vw 70px;border-bottom:1px solid var(--line);position:relative}
+section .in{max-width:1100px;margin:0 auto;opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+section.seen .in{opacity:1;transform:none}
+.kicker{font:600 12px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;transition:color .5s}
+h1{font-size:clamp(56px,9vw,120px);font-weight:900;letter-spacing:-.04em;line-height:.92;margin:14px 0 22px}
+h1 span{color:var(--accent);transition:color .5s}
+h2{font-size:clamp(30px,4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:10px 0 14px}
+h3{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:34px 0 12px}
+p.lead{font-size:19px;color:#b9c6be;max-width:720px}
+p.note{color:var(--muted);font-size:14px;max-width:760px;margin-top:10px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;transition:border-color .3s,transform .3s}
+.card:hover{border-color:rgba(var(--accent-rgb),.5)}
+.stat .v{font-size:44px;font-weight:900;letter-spacing:-.03em;line-height:1;color:var(--accent);transition:color .5s}
+.stat .l{margin-top:8px;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.chip{padding:9px 14px;border:1px solid var(--line);border-radius:99px;font-size:13px;font-weight:600;background:var(--panel)}
+.chip i{font-style:normal;color:var(--accent);margin-right:6px;font-family:"JetBrains Mono",monospace;transition:color .5s}
+img.fig{width:100%;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;display:block;background:#fff}
+figure figcaption{font-size:12px;color:var(--muted);margin-top:6px}
+video{width:100%;border-radius:12px;border:1px solid var(--line);background:#000}
+
+/* tables */
+.tw{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:9px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600;background:var(--panel2);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(var(--accent-rgb),.07)}
+
+/* before / after */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ba .card h4{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px}
+.ba .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.ba .row:last-child{border:0}
+.ba .row b{font-family:"JetBrains Mono",monospace;font-weight:600}
+.ba .good b{color:var(--accent)}
+.bar{height:10px;background:var(--panel2);border-radius:6px;overflow:hidden}
+.bar>div{height:100%;background:var(--accent);border-radius:6px;transition:width .8s cubic-bezier(.2,.8,.2,1),background .5s}
+
+/* controls */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.seg button{background:none;border:0;color:var(--muted);padding:8px 16px;font:600 13px Archivo,sans-serif;cursor:pointer;transition:all .2s}
+.seg button.on{background:rgba(var(--accent-rgb),.18);color:var(--text)}
+.seg button:hover{color:var(--text)}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:14px 0}
+input[type=range]{accent-color:var(--accent);flex:1;min-width:200px}
+.play{width:42px;height:42px;border-radius:50%;border:0;background:var(--accent);color:#000;font-size:16px;cursor:pointer;transition:background .5s,transform .15s}
+.play:active{transform:scale(.93)}
+.pill{padding:5px 12px;border-radius:99px;font:600 12px "JetBrains Mono",monospace;background:var(--panel2);border:1px solid var(--line)}
+canvas{width:100%;display:block;border-radius:12px;border:1px solid var(--line)}
+
+/* players */
+.plist{display:grid;gap:4px;max-height:430px;overflow:auto;padding-right:6px}
+.pl{display:grid;grid-template-columns:70px 1fr 60px;gap:10px;align-items:center;padding:6px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .2s}
+.pl:hover{background:var(--panel2)}
+.pl.on{background:rgba(var(--accent-rgb),.12);border-color:rgba(var(--accent-rgb),.5)}
+.pl span{font:600 12px "JetBrains Mono",monospace;color:var(--muted)}
+.pl.on span:first-child{color:var(--text)}
+
+.tip{position:absolute;pointer-events:none;background:#000d;border:1px solid var(--line);padding:6px 10px;border-radius:8px;font-size:12px;display:none;white-space:nowrap;z-index:5}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+ul.clean{list-style:none;padding:0;display:grid;gap:12px;max-width:800px}
+ul.clean li{padding:14px 18px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;font-size:15px;color:#c8d3cc;transition:border-color .5s}
+#lb{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+#lb img{max-width:94vw;max-height:94vh;border-radius:8px;background:#fff}
+@media(max-width:900px){
+  nav{position:fixed;inset:0 0 auto 0;width:auto;height:54px;flex-direction:row;align-items:center;padding:0 10px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .brand,.sub,.progress{display:none}
+  nav a{white-space:nowrap;padding:8px 10px}
+  nav a.on::before{display:none}
+  main{margin-left:0}section{padding-top:90px}
+  .ba{grid-template-columns:1fr}.g2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-sec="hero">
+
+<nav id="nav">
+  <div class="brand">False<b>Nine</b></div>
+  <div class="sub">football vision + tactics</div>
+  <a href="#hero" data-s="hero" class="on"><i>01</i>Overview</a>
+  <a href="#detect" data-s="detect"><i>02</i>Detection</a>
+  <a href="#track" data-s="track"><i>03</i>Tracking</a>
+  <a href="#pitch" data-s="pitch"><i>04</i>Pitch mapping</a>
+  <a href="#match" data-s="match"><i>05</i>Match analysis</a>
+  <a href="#limits" data-s="limits"><i>06</i>Limits</a>
+  <div class="progress"><div id="prog"></div></div>
+</nav>
+
+<main>
+<!-- ===================================================== 01 -->
+<section id="hero" data-accent="198,244,50">
+ <div class="in">
+  <div class="kicker">Computer vision · data science · tactics</div>
+  <h1>False<span>Nine</span></h1>
+  <p class="lead">From broadcast video to tactical insight: find the players and the ball, follow them, put them on a pitch in metres, then measure what the teams actually do.</p>
+  <div class="grid g4" style="margin-top:44px" id="heroStats"></div>
+  <div class="chips">
+   <div class="chip"><i>1</i>Detect</div><div class="chip"><i>2</i>Track</div><div class="chip"><i>3</i>Teams</div>
+   <div class="chip"><i>4</i>Pitch metres</div><div class="chip"><i>5</i>Metrics</div><div class="chip"><i>6</i>Tactics</div>
+  </div>
+ </div>
+</section>
+
+<!-- ===================================================== 02 -->
+<section id="detect" data-accent="255,176,32">
+ <div class="in">
+  <div class="kicker">02 · Detection</div>
+  <h2>Fine-tuned to stop seeing ghosts</h2>
+  <p class="lead">YOLO11m trained at 1280 px, because the ball is only about 20 px wide. The big win is fewer false boxes.</p>
+  <h3>Pretrained vs fine-tuned (test split)</h3>
+  <div class="ba" id="ba"></div>
+  <h3>Accuracy by class (AP50)</h3>
+  <div class="grid g3" id="apCards"></div>
+  <p class="note" id="detNote"></p>
+  <h3>Training evidence (click to zoom)</h3>
+  <div class="grid g3">
+   <figure><img class="fig" src="../assets/results.png" alt=""><figcaption>Training curves</figcaption></figure>
+   <figure><img class="fig" src="../assets/confusion_matrix_normalized.png" alt=""><figcaption>Confusion matrix</figcaption></figure>
+   <figure><img class="fig" src="../assets/BoxPR_curve.png" alt=""><figcaption>Precision-recall</figcaption></figure>
+  </div>
+ </div>
+</section>
+
+<!-- ===================================================== 03 -->
+<section id="track" data-accent="62,193,255">
+ <div class="in">
+  <div class="kicker">03 · Tracking and teams</div>
+  <h2>Same person, same number</h2>
+  <p class="lead">ByteTrack gives everyone an ID; shirt colour splits the teams. This clip is from a different match than the training data.</p>
+  <div class="grid g2" style="margin-top:26px;align-items:start">
+   <video src="../assets/tracked_h264.mp4" controls loop muted playsinline preload="metadata"></video>
+   <div class="grid" style="grid-template-columns:1fr 1fr" id="trkStats"></div>
+  </div>
+  <h3>Tracker settings compared</h3>
+  <div class="tw" id="trkTable"></div>
+  <h3>Summary and one photo per tracked person</h3>
+  <div class="grid g2">
+   <figure><img class="fig" src="../assets/tracking_summary.png" alt=""></figure>
+   <figure><img class="fig" src="../assets/track_contact_sheet.png" alt=""><figcaption>Contact sheet</figcaption></figure>
+  </div>
+  <p class="note">The model's “Ref” label did not transfer to this match (it called blue-shirt players referees), so people are grouped by shirt colour, not by the model's class.</p>
+ </div>
+</section>
+
+<!-- ===================================================== 04 -->
+<section id="pitch" data-accent="180,140,255">
+ <div class="in">
+  <div class="kicker">04 · Pitch mapping</div>
+  <h2>From pixels to metres</h2>
+  <p class="lead">A homography maps the image onto the pitch plane. With a known calibration the error is about a third of a metre; tracking the camera afterwards drifts.</p>
+  <div class="grid g3" style="margin-top:26px" id="pitchStats"></div>
+  <h3>Drift when only frame 1 is calibrated</h3>
+  <div class="card"><div class="chart" id="driftChart"></div><div class="legend" id="driftLegend"></div></div>
+  <p class="note" id="driftNote"></p>
+  <h3>Ground truth vs ours</h3>
+  <div class="grid g2">
+   <figure><img class="fig" src="../assets/gt_frame_vs_pitch.png" alt=""><figcaption>Annotated boxes and the same players on the pitch</figcaption></figure>
+   <figure><img class="fig" src="../assets/pitch_view_ours_vs_gt.png" alt=""><figcaption>Our tracked players vs ground truth</figcaption></figure>
+  </div>
+  <h3>Camera-tracking variants</h3>
+  <div class="tw" id="varTable"></div>
+  <div style="margin-top:14px"><img class="fig" src="../assets/camera_tracking_variants.png" alt=""></div>
+ </div>
+</section>
+
+<!-- ===================================================== 05 -->
+<section id="match" data-accent="255,93,115">
+ <div class="in">
+  <div class="kicker">05 · Match analysis · Metrica sample game 1</div>
+  <h2>What the teams actually do</h2>
+  <p class="lead">Real 25 Hz tracking data. Replay the match, then look at workload, team shape and space.</p>
+
+  <h3>Replay</h3>
+  <div class="card" style="padding:14px">
+   <canvas id="pitchCv" width="1050" height="680"></canvas>
+   <div class="ctrl">
+    <button class="play" id="playBtn">▶</button>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <span class="pill" id="clock">0.0 min</span>
+    <span class="pill" id="possPill">—</span>
+    <div class="seg" id="speedSeg"><button data-v="1">1×</button><button data-v="5" class="on">5×</button><button data-v="20">20×</button></div>
+   </div>
+   <div class="legend"><span><i style="background:var(--home)"></i>Home (attacks right)</span><span><i style="background:var(--away)"></i>Away (attacks left)</span><span><i style="background:#fff"></i>Ball</span></div>
+  </div>
+
+  <h3>Player workload</h3>
+  <div class="ctrl" style="margin-top:0"><div class="seg" id="teamSeg"><button data-t="Home" class="on">Home</button><button data-t="Away">Away</button></div></div>
+  <div class="grid g2" style="align-items:start">
+   <div class="card"><div class="plist" id="plist"></div></div>
+   <div class="card" id="pdetail"></div>
+  </div>
+
+  <h3>Team shape over the match</h3>
+  <div class="ctrl" style="margin-top:0"><div class="seg" id="shapeSeg"></div></div>
+  <div class="card"><div class="chart" id="shapeChart"></div>
+   <div class="legend"><span><i style="background:var(--home)"></i>Home</span><span><i style="background:var(--away)"></i>Away</span></div></div>
+
+  <h3>With the ball vs without it</h3>
+  <div class="tw" id="possTable"></div>
+  <div style="margin-top:14px"><img class="fig" src="../assets/shape_by_possession.png" alt=""></div>
+
+  <h3>Who controls the space?</h3>
+  <div class="grid g2">
+   <figure><img class="fig" src="../assets/space_control.png" alt=""></figure>
+   <div class="tw" id="spaceTable"></div>
+  </div>
+
+  <h3>Shape after losing the ball</h3>
+  <div class="grid g2">
+   <figure><img class="fig" src="../assets/shape_after_turnover.png" alt=""></figure>
+   <div class="tw" id="turnTable"></div>
+  </div>
+ </div>
+</section>
+
+<!-- ===================================================== 06 -->
+<section id="limits" data-accent="154,167,178">
+ <div class="in">
+  <div class="kicker">06 · Honest limits</div>
+  <h2>What not to over-read</h2>
+  <ul class="clean" style="margin-top:26px">
+   <li>Detection scores come from a 19-image test set taken from the same match as training, so they are optimistic.</li>
+   <li>Tracking works in image space, so IDs break when the camera pans fast (33 IDs for roughly 25 real people).</li>
+   <li>Frame 1 is calibrated from ground-truth labels; after that the camera is tracked automatically: under 1 m for about 11 s, then 2–3 m.</li>
+   <li>Tactical findings come from one sample match; the gap between the teams is small next to the spread within each state.</li>
+   <li>Space control is a nearest-player map. It ignores speed and the ball.</li>
+   <li>Possession and ball-in-play come from the events file with simple rules.</li>
+  </ul>
+  <h3>Data and credits</h3>
+  <ul class="clean">
+   <li>Detection images: Roboflow Universe, soccer-players-ckbru (CC BY 4.0)</li>
+   <li>Video clips and pitch annotations: SoccerNet Game State Reconstruction</li>
+   <li>Tracking and event data: Metrica Sports sample data (check their repository licence)</li>
+  </ul>
+ </div>
+</section>
+</main>
+
+<div id="lb"><img alt=""></div>
+<div class="tip" id="tip"></div>
+
+<script src="data.js"></script>
+<script src="replay.js"></script>
+<script>
+(function(){
+"use strict";
+const D = window.DATA || {}, K = D.key || {};
+const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const fmt=(v,d=1)=>v==null||isNaN(v)?"–":(+v).toFixed(d);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------------- scroll spy: highlight nav + change theme ---------------- */
+const secs=$$("section"), links=$$("nav a");
+function setActive(sec){
+  links.forEach(a=>a.classList.toggle("on",a.dataset.s===sec.id));
+  const rgb=sec.dataset.accent, [r,g,b]=rgb.split(",").map(Number);
+  const root=document.documentElement.style;
+  root.setProperty("--accent-rgb",rgb);
+  root.setProperty("--accent",`rgb(${r},${g},${b})`);
+  document.body.dataset.sec=sec.id;
+}
+const spy=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ setActive(e.target); e.target.classList.add("seen"); } });
+},{rootMargin:"-45% 0px -50% 0px"});
+const reveal=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("seen"); }),{threshold:.08});
+secs.forEach(s=>{spy.observe(s);reveal.observe(s);});
+addEventListener("scroll",()=>{
+  const h=document.documentElement; $("#prog").style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+"%";
+},{passive:true});
+
+/* lightbox */
+const lb=$("#lb"), lbi=$("#lb img");
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("fig")){ lbi.src=e.target.src; lb.style.display="flex"; }
+  else if(lb.contains(e.target)) lb.style.display="none";
+});
+addEventListener("keydown",e=>{ if(e.key==="Escape") lb.style.display="none"; });
+$$("img.fig").forEach(i=>i.addEventListener("error",()=>{i.closest("figure")?.remove?.();if(!i.closest("figure"))i.remove();}));
+
+/* ---------------- helpers ---------------- */
+function stat(v,l){return `<div class="card stat"><div class="v">${v}</div><div class="l">${l}</div></div>`;}
+function table(el,t,opts={}){
+  if(!t){el.innerHTML='<div class="card" style="color:var(--muted)">No data</div>';return;}
+  el.innerHTML="<table><thead><tr>"+t.columns.map(c=>`<th>${c}</th>`).join("")+"</tr></thead><tbody>"+
+   t.rows.map(r=>"<tr>"+r.map(v=>`<td>${typeof v==="number"?(Number.isInteger(v)?v:v.toFixed(2)):(v??"–")}</td>`).join("")+"</tr>").join("")+"</tbody></table>";
+}
+function lineChart(el,xs,series,o={}){
+  const W=900,H=o.h||300,m={l:48,r:14,t:12,b:30};
+  let ymin=Infinity,ymax=-Infinity;
+  series.forEach(s=>s.ys.forEach(y=>{if(y!=null&&!isNaN(y)){ymin=Math.min(ymin,y);ymax=Math.max(ymax,y);}}));
+  if(o.ymin!=null) ymin=o.ymin; const pad=(ymax-ymin)*.08||1; if(o.ymin==null) ymin-=pad; ymax+=pad;
+  const x0=xs[0],x1=xs[xs.length-1];
+  const X=x=>m.l+(x-x0)/(x1-x0||1)*(W-m.l-m.r), Y=y=>H-m.b-(y-ymin)/(ymax-ymin||1)*(H-m.t-m.b);
+  let g="";
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4,y=Y(v);g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="#26332d"/><text x="${m.l-8}" y="${y+4}" fill="#8b9a92" font-size="11" text-anchor="end">${v.toFixed(o.dec??0)}</text>`;}
+  for(let i=0;i<=5;i++){const v=x0+(x1-x0)*i/5;g+=`<text x="${X(v)}" y="${H-8}" fill="#8b9a92" font-size="11" text-anchor="middle">${v.toFixed(o.xdec??0)}</text>`;}
+  if(o.xlabel) g+=`<text x="${W-m.r}" y="${H-8}" fill="#8b9a92" font-size="11" text-anchor="end" dy="-14"></text>`;
+  series.forEach(s=>{
+    let d="",pen=false;
+    s.ys.forEach((y,i)=>{ if(y==null||isNaN(y)){pen=false;return;} d+=(pen?"L":"M")+X(xs[i]).toFixed(1)+","+Y(y).toFixed(1); pen=true; });
+    g+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  });
+  g+=`<line id="cx" y1="${m.t}" y2="${H-m.b}" stroke="#fff4" style="display:none"/>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${g}</svg>`;
+  const svg=$("svg",el),cx=$("#cx",el),tip=$("#tip");
+  svg.addEventListener("mousemove",ev=>{
+    const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)/r.width*W;
+    const xv=x0+(px-m.l)/(W-m.l-m.r)*(x1-x0); if(xv<x0||xv>x1){return;}
+    let lo=0,hi=xs.length-1; while(hi-lo>1){const mid=(lo+hi)>>1; xs[mid]<xv?lo=mid:hi=mid;}
+    const i=Math.abs(xs[lo]-xv)<Math.abs(xs[hi]-xv)?lo:hi;
+    cx.setAttribute("x1",X(xs[i]));cx.setAttribute("x2",X(xs[i]));cx.style.display="";
+    tip.style.display="block";tip.style.left=(ev.pageX+14)+"px";tip.style.top=(ev.pageY-10)+"px";
+    tip.innerHTML=`<b>${(o.xname||"x")} ${xs[i].toFixed(o.xdec??0)}</b><br>`+series.map(s=>`<span style="color:${s.color}">●</span> ${s.name}: ${fmt(s.ys[i],o.dec??1)}`).join("<br>");
+  });
+  svg.addEventListener("mouseleave",()=>{cx.style.display="none";tip.style.display="none";});
+}
+
+/* ---------------- 01 hero ---------------- */
+{
+  const h=K.headline||{};
+  $("#heroStats").innerHTML=
+    stat(fmt(h.map50,3),"detection mAP50 on the test set")+
+    stat(`${h.false_boxes_before} → ${h.false_boxes_after}`,"false person boxes, pretrained vs fine-tuned")+
+    stat(`${h.calib_error_known_m} m`,"median pitch-position error, known calibration")+
+    stat(`${h.in_play_pct}%`,"of the Metrica game the ball is in play");
+}
+
+/* ---------------- 02 detection ---------------- */
+{
+  const d=K.detection||{}, ba=d.before_after||[];
+  $("#ba").innerHTML=ba.map((m,i)=>`<div class="card ${i?'good':''}"><h4>${m.model}</h4>
+    <div class="row"><span>Ball found</span><b>${m["ball found"]}</b></div>
+    <div class="row"><span>Ball: extra boxes</span><b>${m["ball extra boxes"]}</b></div>
+    <div class="row"><span>People found</span><b>${m["people found"]}</b></div>
+    <div class="row"><span>People: extra boxes</span><b>${m["people extra boxes"]}</b></div></div>`).join("");
+  $("#apCards").innerHTML=Object.entries(d.ap50||{}).map(([k,v])=>
+    `<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b>${k}</b><span class="mono">${fmt(v,3)}</span></div><div class="bar"><div style="width:0" data-w="${v*100}"></div></div></div>`).join("");
+  $("#detNote").textContent=`mAP50 ${fmt(d.map50,3)}, mAP50-95 ${fmt(d.map50_95,3)} on ${d.test_images} test images from the same match as training.`;
+  new IntersectionObserver((es,ob)=>es.forEach(e=>{if(e.isIntersecting){$$(".bar>div",e.target).forEach(b=>b.style.width=b.dataset.w+"%");ob.unobserve(e.target);}}),{threshold:.3}).observe($("#apCards"));
+}
+
+/* ---------------- 03 tracking ---------------- */
+{
+  const t=K.tracking||{};
+  $("#trkStats").innerHTML=
+    stat(t.ids_default,"track IDs, default settings")+stat(t.ids_best,"track IDs, tuned")+
+    stat(t.ball_detected_pct+"%","ball detected")+stat(t.ball_filled_pct+"%","ball after gap-filling");
+  table($("#trkTable"),(D.tables||{}).tracker);
+}
+
+/* ---------------- 04 pitch ---------------- */
+{
+  const p=K.pitch||{};
+  $("#pitchStats").innerHTML=
+    stat(p.homography_residual_m+" m","flat-pitch model fit (median)")+
+    stat(p.known_median_m+" m","our boxes, known calibration (p90 "+p.known_p90_m+" m)")+
+    stat(p.cam_median_m_300_449+" m","camera-tracked, frames 300–449");
+  const dr=D.drift;
+  if(dr&&dr.x&&dr.x.length){
+    const series=[]; if(dr.median) series.push({name:"median error (m)",color:css("--accent"),ys:dr.median});
+    if(dr.p90) series.push({name:"90th percentile (m)",color:"#ff8aa0",ys:dr.p90});
+    lineChart($("#driftChart"),dr.x,series,{dec:1,ymin:0,xname:"frame"});
+    $("#driftLegend").innerHTML=series.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join("");
+  }
+  $("#driftNote").textContent=`Under 1 m for roughly the first ${p.cam_under_1m_frames} frames (about 11 s), then 2–3 m (${p.cam_error_m_750} m at frame 750).`;
+  table($("#varTable"),(D.tables||{}).variants);
+}
+
+/* ---------------- 05 match ---------------- */
+table($("#possTable"),(D.tables||{}).possession);
+table($("#spaceTable"),(D.tables||{}).space);
+table($("#turnTable"),(D.tables||{}).turnover);
+
+/* replay */
+(function(){
+  const R=window.REPLAY, cv=$("#pitchCv"); if(!R||!cv) return;
+  const ctx=cv.getContext("2d"), S=R.stride, N=R.data.length/S, nh=R.n_home, na=R.n_away;
+  const A=R.data;
+  const W=cv.width,H=cv.height, sx=(W-60)/105, sy=(H-40)/68, cxp=W/2, cyp=H/2;
+  const PX=x=>cxp+x*sx, PY=y=>cyp-y*sy;
+  const POSS=["loose ball","Home have the ball","Away have the ball","ball out of play"];
+  let t=0, playing=false, speed=5, last=0; const tmax=R.t_end;
+  function pitch(){
+    ctx.fillStyle="#13271d";ctx.fillRect(0,0,W,H);
+    for(let i=0;i<14;i++){ if(i%2) {ctx.fillStyle="#ffffff07";ctx.fillRect(PX(-52.5+i*7.5),PY(34),7.5*sx,68*sy);} }
+    ctx.strokeStyle="#ffffff55";ctx.lineWidth=2;
+    const r=(a,b,c,d)=>ctx.strokeRect(PX(a),PY(d),(c-a)*sx,(d-b)*sy);
+    r(-52.5,-34,52.5,34);ctx.beginPath();ctx.moveTo(PX(0),PY(34));ctx.lineTo(PX(0),PY(-34));ctx.stroke();
+    ctx.beginPath();ctx.arc(PX(0),PY(0),9.15*sx,0,7);ctx.stroke();
+    r(-52.5,-20.16,-36,20.16);r(36,-20.16,52.5,20.16);r(-52.5,-9.16,-47,9.16);r(47,-9.16,52.5,9.16);
+  }
+  function pos(f0,f1,a,j){ const v0=A[f0*S+j],v1=A[f1*S+j]; if(v0<-9000) return null; if(v1<-9000) return v0/10; return (v0+(v1-v0)*a)/10; }
+  function draw(){
+    pitch();
+    const fr=t*R.hz; let f0=Math.min(N-2,Math.max(0,Math.floor(fr))), a=Math.min(1,Math.max(0,fr-f0)), f1=f0+1;
+    const dot=(x,y,c,r)=>{ if(x==null||y==null) return; ctx.beginPath();ctx.arc(PX(x),PY(y),r,0,7);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=1.5;ctx.stroke(); };
+    // ball trail
+    for(let k=8;k>=1;k--){ const ff=Math.max(0,f0-k); const x=A[ff*S+3]/10,y=A[ff*S+4]/10; if(A[ff*S+3]>-9000){ctx.beginPath();ctx.arc(PX(x),PY(y),4,0,7);ctx.fillStyle=`rgba(255,255,255,${.04*(9-k)})`;ctx.fill();} }
+    for(let i=0;i<nh;i++) dot(pos(f0,f1,a,5+i),pos(f0,f1,a,5+nh+i),css("--home"),9);
+    for(let i=0;i<na;i++) dot(pos(f0,f1,a,5+2*nh+i),pos(f0,f1,a,5+2*nh+na+i),css("--away"),9);
+    const bx=pos(f0,f1,a,3),by=pos(f0,f1,a,4); if(bx!=null){ctx.beginPath();ctx.arc(PX(bx),PY(by),6,0,7);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#000";ctx.stroke();}
+    const fi=Math.round(fr), ps=A[Math.min(N-1,fi)*S+2];
+    $("#clock").textContent=(t/60).toFixed(1)+" min";
+    $("#possPill").textContent=POSS[ps]||"—";
+    $("#possPill").style.color=ps==1?css("--home"):ps==2?css("--away"):"";
+    $("#scrub").value=Math.round(t/tmax*1000);
+  }
+  function loop(ts){ if(playing){ t+=(ts-last)/1000*speed; if(t>=tmax){t=tmax;playing=false;$("#playBtn").textContent="▶";} draw(); } last=ts; requestAnimationFrame(loop); }
+  $("#playBtn").onclick=()=>{playing=!playing;$("#playBtn").textContent=playing?"❚❚":"▶";};
+  $("#scrub").oninput=e=>{t=e.target.value/1000*tmax;draw();};
+  $$("#speedSeg button").forEach(b=>b.onclick=()=>{speed=+b.dataset.v;$$("#speedSeg button").forEach(x=>x.classList.toggle("on",x===b));});
+  t=Math.min(tmax,600); draw(); requestAnimationFrame(loop);
+})();
+
+/* workload */
+(function(){
+  const rows=D.workload||[]; if(!rows.length) return;
+  const keys=Object.keys(rows[0]);
+  const zoneDefs=[["walk","Walk"],["jog","Jog"],["run","Run"],["high","High-speed"],["sprint","Sprint"]];
+  const zones=zoneDefs.map(([p,l])=>({l,k:keys.find(k=>k.toLowerCase().startsWith(p))})).filter(z=>z.k);
+  let team="Home", sel=null;
+  function render(){
+    const sub=rows.filter(r=>r.team===team).sort((a,b)=>b.distance_km-a.distance_km);
+    if(!sel||!sub.find(r=>r.player===sel)) sel=sub[0]?.player;
+    const mx=Math.max(...sub.map(r=>r.distance_km));
+    $("#plist").innerHTML=sub.map(r=>`<div class="pl ${r.player===sel?'on':''}" data-p="${r.player}"><span>${r.player}</span><div class="bar"><div style="width:${r.distance_km/mx*100}%"></div></div><span>${fmt(r.distance_km,2)} km</span></div>`).join("");
+    $$(".pl").forEach(el=>el.onclick=()=>{sel=el.dataset.p;render();});
+    const r=sub.find(x=>x.player===sel); if(!r) return;
+    const zm=Math.max(...zones.map(z=>r[z.k]||0),1);
+    $("#pdetail").innerHTML=`<div style="font-size:26px;font-weight:800;letter-spacing:-.02em">${r.player} <span class="pill" style="vertical-align:middle">${team}</span></div>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);margin:16px 0">
+        <div><div class="mono" style="font-size:24px;color:var(--accent)">${fmt(r.distance_km,2)}</div><div style="color:var(--muted);font-size:12px">km covered</div></div>
+        <div><div class="mono" style="font-size:24px;color:var(--accent)">${r.sprints??"–"}</div><div style="color:var(--muted);font-size:12px">sprints</div></div>
+        <div><div class="mono" style="font-size:24px;color:var(--accent)">${fmt(r.top_speed_kmh,1)}</div><div style="color:var(--muted);font-size:12px">top speed km/h</div></div></div>
+      <div style="color:var(--muted);font-size:12px;margin-bottom:8px">Metres in each speed zone · ${fmt(r.minutes,0)} min played</div>`+
+      zones.map(z=>`<div style="display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center;margin:7px 0;font-size:13px"><span>${z.l}</span><div class="bar"><div style="width:${(r[z.k]||0)/zm*100}%"></div></div><span class="mono" style="text-align:right">${fmt(r[z.k],0)} m</span></div>`).join("");
+  }
+  $$("#teamSeg button").forEach(b=>b.onclick=()=>{team=b.dataset.t;sel=null;$$("#teamSeg button").forEach(x=>x.classList.toggle("on",x===b));render();});
+  render();
+})();
+
+/* shape */
+(function(){
+  const s=D.shape; if(!s||!s.t) return;
+  const names={length:"Team length (m)",width:"Team width (m)",cx:"Centroid x (m)",line_height:"Defensive line height (m)",block_depth:"Block depth (m)",spread:"Spread (m)"};
+  const ms=Object.keys(s.home).filter(k=>s.away[k]);
+  let cur=ms[0];
+  $("#shapeSeg").innerHTML=ms.map(m=>`<button data-m="${m}" class="${m===cur?'on':''}">${names[m]||m}</button>`).join("");
+  function render(){ lineChart($("#shapeChart"),s.t,[{name:"Home",color:css("--home"),ys:s.home[cur]},{name:"Away",color:css("--away"),ys:s.away[cur]}],{dec:1,xdec:0,xname:"minute"}); }
+  $$("#shapeSeg button").forEach(b=>b.onclick=()=>{cur=b.dataset.m;$$("#shapeSeg button").forEach(x=>x.classList.toggle("on",x===b));render();});
+  render();
+})();
+})();
+</script>
+</body>
+</html>
